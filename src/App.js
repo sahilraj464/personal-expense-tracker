@@ -1,25 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import TransactionForm from './components/TransactionForm';
+import TransactionList from './components/TransactionList';
+import Summary from './components/Summary';
+import { getTransactions } from './api';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+    const [transactions, setTransactions] = useState([]);
+
+    const fetchTransactions = async () => {
+        const data = await getTransactions();
+        setTransactions(data);
+    };
+
+    useEffect(() => {
+        fetchTransactions();
+    }, []);
+
+    const handleTransactionAdded = (newTransaction) => {
+        setTransactions((prev) => [...prev, newTransaction]);
+    };
+
+    const handleTransactionDeleted = (id) => {
+        setTransactions((prev) => prev.filter(transaction => transaction.id !== id));
+    };
+
+    return (
+        <div>
+            <h1>Personal Expense Tracker</h1>
+            <TransactionForm onTransactionAdded={handleTransactionAdded} />
+            <TransactionList transactions={transactions} onTransactionDeleted={handleTransactionDeleted} />
+            <Summary />
+        </div>
+    );
+};
 
 export default App;
